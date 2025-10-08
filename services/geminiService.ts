@@ -2,11 +2,31 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Question } from '../types';
 import { TOTAL_QUESTIONS } from '../constants';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+let ai: GoogleGenAI | null = null;
+
+/**
+ * Initializes and returns a singleton instance of the GoogleGenAI client.
+ * Throws an error if the API key is not configured in the environment.
+ */
+const getAiClient = (): GoogleGenAI => {
+  if (ai) {
+    return ai;
+  }
+  
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    // This specific error message is caught by the App component to display a user-friendly notice.
+    throw new Error("API_KEY environment variable is not set. Please configure it in your deployment environment.");
+  }
+
+  ai = new GoogleGenAI({ apiKey });
+  return ai;
+};
 
 export const generateMathQuestions = async (): Promise<Question[]> => {
   try {
-    const response = await ai.models.generateContent({
+    const client = getAiClient();
+    const response = await client.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Generate ${TOTAL_QUESTIONS} math questions. The questions should start very easy, suitable for a 1st grader, and progressively get harder, with the last question being challenging for a high school student. The topics should range from basic arithmetic to simple algebra. Provide the question and the numerical answer.`,
       config: {
@@ -49,6 +69,12 @@ export const generateMathQuestions = async (): Promise<Question[]> => {
   } catch (err) {
     const error = err as Error;
     console.error("Error generating math questions:", error.message, error.stack);
+
+    // If the error is our custom API key error, rethrow it so the UI can be specific.
+    if (error.message.includes("API_KEY")) {
+        throw error;
+    }
+    
     throw new Error("Failed to communicate with the AI model to generate questions.");
   }
 };

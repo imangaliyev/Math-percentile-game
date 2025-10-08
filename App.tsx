@@ -4,7 +4,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultsScreen from './components/ResultsScreen';
 import { generateMathQuestions } from './services/geminiService';
-import { saveScore } from './services/scoreService';
+import { saveScore, getAllScores } from './services/scoreService';
 
 const Spinner: React.FC = () => (
   <div className="flex flex-col items-center justify-center space-y-4">
@@ -21,7 +21,7 @@ export default function App() {
   const [userName, setUserName] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [finalScore, setFinalScore] = useState<number>(0);
-  const [allScores, setAllScores] = useState<number[]>([]);
+  const [allScores, setAllScores] = useState<number[]>(getAllScores());
   const [error, setError] = useState<string | null>(null);
 
   const handleStartQuiz = useCallback(async (name: string) => {
@@ -35,7 +35,11 @@ export default function App() {
     } catch (err) {
       const error = err as Error;
       console.error("Failed to generate questions:", error.message, error.stack);
-      setError("Sorry, we couldn't generate the quiz. Please try again later.");
+      if (error.message.includes("API_KEY")) {
+        setError("Application not configured: The Gemini API key is missing.");
+      } else {
+        setError("Sorry, we couldn't generate the quiz. Please try again later.");
+      }
       setGameState(GameState.Welcome);
     }
   }, []);
@@ -44,7 +48,7 @@ export default function App() {
     setFinalScore(score);
     saveScore(score, userName);
     // Add the new score to our local state to ensure the results screen is up-to-date
-    setAllScores(prevScores => [...prevScores, score]);
+    setAllScores(getAllScores());
     setGameState(GameState.Results);
   }, [userName]);
 
