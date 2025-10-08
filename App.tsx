@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { GameState, Question } from './types';
 import WelcomeScreen from './components/WelcomeScreen';
 import QuizScreen from './components/QuizScreen';
 import ResultsScreen from './components/ResultsScreen';
 import { generateMathQuestions } from './services/geminiService';
-import { saveScore, getAllScores } from './services/scoreService';
+import { saveScore } from './services/scoreService';
 
 const Spinner: React.FC = () => (
   <div className="flex flex-col items-center justify-center space-y-4">
@@ -24,15 +24,6 @@ export default function App() {
   const [allScores, setAllScores] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Fetch initial scores when the app loads.
-    const fetchScores = async () => {
-      const scores = await getAllScores();
-      setAllScores(scores);
-    };
-    fetchScores();
-  }, []);
-
   const handleStartQuiz = useCallback(async (name: string) => {
     setUserName(name);
     setGameState(GameState.Loading);
@@ -49,9 +40,9 @@ export default function App() {
     }
   }, []);
 
-  const handleQuizComplete = useCallback(async (score: number) => {
+  const handleQuizComplete = useCallback((score: number) => {
     setFinalScore(score);
-    await saveScore(score, userName);
+    saveScore(score, userName);
     // Add the new score to our local state to ensure the results screen is up-to-date
     setAllScores(prevScores => [...prevScores, score]);
     setGameState(GameState.Results);

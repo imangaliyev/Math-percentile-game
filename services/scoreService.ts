@@ -1,50 +1,20 @@
-import { collection, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from './firebase';
-
-const SCORES_COLLECTION = 'scores';
+// In-memory store for scores, simulating a database for the session.
+let scores: number[] = [];
 
 /**
- * Retrieves all scores from Firestore.
- * @returns A Promise that resolves to an array of numbers.
+ * Retrieves all scores from the in-memory store.
+ * @returns A copy of all scores recorded during the session.
  */
-export const getAllScores = async (): Promise<number[]> => {
-  try {
-    const scoresCollection = collection(db, SCORES_COLLECTION);
-    const querySnapshot = await getDocs(scoresCollection);
-    const scores: number[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      // Ensure we only push numbers to the array
-      if (typeof data.score === 'number') {
-        scores.push(data.score);
-      }
-    });
-    return scores;
-  } catch (err) {
-    const error = err as Error;
-    console.error("Error retrieving scores from Firestore:", error.message, error.stack);
-    // Return an empty array on error to prevent the app from crashing.
-    return [];
-  }
+export const getAllScores = (): number[] => {
+  // Return a copy to prevent direct mutation of the internal array from outside.
+  return [...scores];
 };
 
 /**
- * Saves a new score to Firestore.
+ * Saves a new score to the in-memory store.
  * @param score The score to save.
- * @param userName The name of the user.
- * @returns A Promise that resolves when the save is complete.
+ * @param userName The name of the user (kept for interface consistency, but unused).
  */
-export const saveScore = async (score: number, userName: string): Promise<void> => {
-  try {
-    const scoresCollection = collection(db, SCORES_COLLECTION);
-    await addDoc(scoresCollection, {
-      score,
-      userName,
-      createdAt: serverTimestamp(), // Add a server-side timestamp
-    });
-  } catch (err) {
-    const error = err as Error;
-    console.error("Error saving score to Firestore:", error.message, error.stack);
-    // We can re-throw or handle it silently. For now, log and continue.
-  }
+export const saveScore = (score: number, userName: string): void => {
+  scores.push(score);
 };
