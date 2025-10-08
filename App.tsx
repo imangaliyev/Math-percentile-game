@@ -68,7 +68,7 @@ export default function App() {
   const renderContent = () => {
     switch (gameState) {
       case GameState.Welcome:
-        return <WelcomeScreen onStart={handleStartQuiz} error={error} />;
+        return <WelcomeScreen onStart={handleStartQuiz} error={error} allScores={allScores} />;
       case GameState.Loading:
         return <Spinner />;
       case GameState.Quiz:
@@ -76,7 +76,7 @@ export default function App() {
       case GameState.Results:
         return <ResultsScreen score={finalScore} userName={userName} onPlayAgain={handlePlayAgain} allScores={allScores} />;
       default:
-        return <WelcomeScreen onStart={handleStartQuiz} error={error} />;
+        return <WelcomeScreen onStart={handleStartQuiz} error={error} allScores={allScores} />;
     }
   };
 

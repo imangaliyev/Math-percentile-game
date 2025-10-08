@@ -104,7 +104,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ questions, userName, onQuizComp
       });
     }, 1000);
 
-    timerRef.current = timerId as unknown as number;
+    timerRef.current = timerId;
 
     return () => {
       clearInterval(timerId);

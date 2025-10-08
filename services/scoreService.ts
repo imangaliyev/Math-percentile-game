@@ -21,7 +21,11 @@ export const getAllScores = async (): Promise<number[]> => {
     });
     return scores;
   } catch (error) {
-    console.error("Error retrieving scores from Firestore:", error);
+    if (error instanceof Error) {
+        console.error("Error retrieving scores from Firestore:", error.message);
+    } else {
+        console.error("An unknown error occurred while retrieving scores:", error);
+    }
     // Return an empty array on error to prevent the app from crashing.
     return [];
   }
@@ -42,7 +46,11 @@ export const saveScore = async (score: number, userName: string): Promise<void> 
       createdAt: serverTimestamp(), // Add a server-side timestamp
     });
   } catch (error) {
-    console.error("Error saving score to Firestore:", error);
+    if (error instanceof Error) {
+        console.error("Error saving score to Firestore:", error.message);
+    } else {
+        console.error("An unknown error occurred while saving score:", error);
+    }
     // We can re-throw or handle it silently. For now, log and continue.
   }
 };

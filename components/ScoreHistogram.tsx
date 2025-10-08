@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLin
 
 interface ScoreHistogramProps {
   allScores: number[];
-  userScore: number;
+  userScore: number | null;
 }
 
 const ScoreHistogram: React.FC<ScoreHistogramProps> = ({ allScores, userScore }) => {
@@ -11,14 +11,24 @@ const ScoreHistogram: React.FC<ScoreHistogramProps> = ({ allScores, userScore })
   const binCount = 10;
   const binSize = 10;
   const bins = Array.from({ length: binCount }, (_, i) => ({
-    range: `${i * binSize + 1}-${(i + 1) * binSize}`,
+    // Bug Fix: Correctly label bins, with the first bin as "0-10".
+    range: i === 0 ? `0-10` : `${i * binSize + 1}-${(i + 1) * binSize}`,
     midpoint: i * binSize + (binSize / 2),
     count: 0,
   }));
 
+  // Bug Fix: A more robust binning logic that correctly handles all integer scores.
+  const scoreToBinIndex = (score: number): number => {
+    const s = Math.round(Math.max(0, Math.min(100, score)));
+    if (s <= 10) {
+      return 0; // Scores 0-10 go in the first bin.
+    }
+    // Scores 11-100 are categorized into the remaining 9 bins.
+    return Math.min(9, Math.ceil(s / binSize) - 1);
+  };
+
   allScores.forEach(score => {
-    const scoreToBin = Math.max(1, Math.min(100, score));
-    const binIndex = Math.floor((scoreToBin - 1) / binSize);
+    const binIndex = scoreToBinIndex(score);
     if (bins[binIndex]) {
       bins[binIndex].count++;
     }
@@ -77,7 +87,8 @@ const ScoreHistogram: React.FC<ScoreHistogramProps> = ({ allScores, userScore })
             radius={[4, 4, 0, 0]}
             barSize={30}
           />
-          {userScore > 0 && (
+          {/* Bug Fix: Show ReferenceLine for score 0 as well. */}
+          {typeof userScore === 'number' && (
             <ReferenceLine
               x={userScore}
               stroke="#f59e0b"
