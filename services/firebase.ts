@@ -1,5 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from "firebase/app";
+// This is a side-effect import. It ensures the Firestore service is registered
+// with the Firebase app instance, preventing the "Service not available" error.
+import "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -12,20 +15,9 @@ const firebaseConfig = {
   appId: "1:381077366877:web:6c8c416bd523b5386145b4"
 };
 
-let db: ReturnType<typeof getFirestore>;
+// Initialize Firebase App in a robust, singleton pattern
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-/**
- * Implements a lazy initialization pattern for Firestore.
- * This ensures that the Firestore service is only requested *after* all necessary
- * Firebase modules have been loaded, permanently fixing the "Service not available"
- * race condition that can occur during the initial module loading phase.
- *
- * @returns The singleton Firestore database instance.
- */
-export const getDb = () => {
-  if (!db) {
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
-  }
-  return db;
-};
+// Initialize Firestore eagerly and export the instance directly.
+// The side-effect import above guarantees that getFirestore() will succeed.
+export const db = getFirestore(app);

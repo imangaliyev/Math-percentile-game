@@ -1,5 +1,5 @@
 import { collection, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { getDb } from './firebase';
+import { db } from './firebase';
 
 const SCORES_COLLECTION = 'scores';
 
@@ -9,7 +9,6 @@ const SCORES_COLLECTION = 'scores';
  */
 export const getAllScores = async (): Promise<number[]> => {
   try {
-    const db = getDb();
     const scoresCollection = collection(db, SCORES_COLLECTION);
     const querySnapshot = await getDocs(scoresCollection);
     const scores: number[] = [];
@@ -36,7 +35,6 @@ export const getAllScores = async (): Promise<number[]> => {
  */
 export const saveScore = async (score: number, userName: string): Promise<void> => {
   try {
-    const db = getDb();
     const scoresCollection = collection(db, SCORES_COLLECTION);
     await addDoc(scoresCollection, {
       score,
