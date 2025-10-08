@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Question } from '../types';
 import { TOTAL_QUESTIONS } from '../constants';
@@ -39,10 +38,17 @@ export const generateMathQuestions = async (): Promise<Question[]> => {
     if (!Array.isArray(questions) || questions.length === 0) {
       throw new Error("AI did not return a valid array of questions.");
     }
+    
+    // While the app is now robust to handle a different number of questions,
+    // let's add a console warning if the AI didn't provide the exact number requested.
+    if (questions.length !== TOTAL_QUESTIONS) {
+        console.warn(`AI generated ${questions.length} questions instead of the requested ${TOTAL_QUESTIONS}.`);
+    }
 
     return questions;
-  } catch (error) {
-    console.error("Error generating math questions:", error);
+  } catch (err) {
+    const error = err as Error;
+    console.error("Error generating math questions:", error.message, error.stack);
     throw new Error("Failed to communicate with the AI model to generate questions.");
   }
 };

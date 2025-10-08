@@ -42,7 +42,8 @@ export default function App() {
       setQuestions(newQuestions);
       setGameState(GameState.Quiz);
     } catch (err) {
-      console.error("Failed to generate questions:", err);
+      const error = err as Error;
+      console.error("Failed to generate questions:", error.message, error.stack);
       setError("Sorry, we couldn't generate the quiz. Please try again later.");
       setGameState(GameState.Welcome);
     }

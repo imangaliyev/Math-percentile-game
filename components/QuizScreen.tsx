@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question } from '../types';
-import { TOTAL_QUESTIONS, TIME_LIMIT_SECONDS, POINTS_PER_CORRECT_ANSWER, MAX_TIME_BONUS } from '../constants';
+import { TIME_LIMIT_SECONDS, POINTS_PER_CORRECT_ANSWER, MAX_TIME_BONUS } from '../constants';
 import ScoreHistogram from './ScoreHistogram';
 
 interface QuizScreenProps {
@@ -79,7 +79,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ questions, userName, onQuizComp
     const updatedScores = [...scores, questionScore];
     setScores(updatedScores);
     
-    if (currentQuestionIndex < TOTAL_QUESTIONS - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setUserAnswer('');
       setTimeLeft(TIME_LIMIT_SECONDS);
@@ -123,7 +123,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ questions, userName, onQuizComp
     <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <p className="text-xl text-gray-400">Question {currentQuestionIndex + 1}/{TOTAL_QUESTIONS}</p>
+          <p className="text-xl text-gray-400">Question {currentQuestionIndex + 1}/{questions.length}</p>
           <p className="text-2xl font-semibold text-cyan-400">Score: {currentScore}</p>
         </div>
         <Timer timeLeft={timeLeft} />

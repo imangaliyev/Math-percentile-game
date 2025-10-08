@@ -6,6 +6,12 @@ import "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
+// SECURITY WARNING: Hardcoding Firebase config like this is common for tutorials
+// and prototypes, but it's not recommended for production applications.
+// In a production environment, you should use environment variables to store
+// sensitive information like the apiKey. Additionally, consider implementing
+// Firebase App Check to ensure that requests to your Firebase backend are
+// coming from your authentic app, preventing abuse of your project resources.
 const firebaseConfig = {
   apiKey: "AIzaSyCC2x853gJX_mnUycOErz7K4kMDjoK62Ww",
   authDomain: "math-percentile-game.firebaseapp.com",
